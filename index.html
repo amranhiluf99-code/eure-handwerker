@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eure Handwerker</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <style>
+    :root {
+      --primary:#f59e0b; --success:#10b981; --danger:#ef4444;
+      --bg:#f8fafc; --surface:#fff; --text:#334155; --text-light:#64748b; --border:#e2e8f0;
+      --radius:10px; --shadow:0 4px 8px rgba(0,0,0,.06);
+    }
+    [data-theme="dark"] {
+      --bg:#0f172a; --surface:#1e293b; --text:#e2e8f0; --text-light:#94a3b8; --border:#334155;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Segoe UI,Tahoma,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    header{background:#0f172a;color:white;padding:1rem;position:sticky;top:0;z-index:10}
+    nav{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .logo{font-size:1.3rem;font-weight:700}
+    .nav-links{display:flex;gap:8px;flex-wrap:wrap}
+    button,.nav-btn{background:var(--primary);color:white;border:none;padding:10px 16px;border-radius:var(--radius);cursor:pointer;font-weight:600}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .nav-btn{background:transparent}
+    .nav-btn:hover{background:rgba(255,255,255,.1)}
+    .secondary{background:var(--border);color:var(--text)}
+    .danger{background:var(--danger)}
+    .success{background:var(--success)}
+    .hidden{display:none!important}
+    .container{max-width:1200px;margin:auto;padding:20px}
+    .hero{background:linear-gradient(rgba(15,23,42,.88),rgba(15,23,42,.96));color:white;padding:60px 20px;text-align:center;border-radius:18px;margin-bottom:25px}
+    .hero h1{font-size:clamp(1.9rem,5vw,3rem);margin-bottom:12px}
+    .hero p{color:#cbd5e1;margin-bottom:24px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .name-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .money-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    @media(max-width:900px){.grid,.name-grid,.money-grid{grid-template-columns:1fr}}
+    .form-group{margin-bottom:14px}
+    label{display:block;margin-bottom:5px;font-weight:600}
+    input,select,textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font:inherit}
+    textarea{resize:vertical}
+    .upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:18px;text-align:center;cursor:pointer;background:var(--bg)}
+    .upload-area input{display:none}
+    .upload-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .upload-preview img{width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid var(--border)}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;font-size:.92rem}
+    th{background:var(--bg)}
+    tr.clickable-row{cursor:pointer}
+    tr.clickable-row:hover{background:rgba(245,158,11,.08)}
+    .status-badge,.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8rem;font-weight:700}
+    .status-open{background:#fef3c7;color:#92400e}
+    .status-accepted{background:#dbeafe;color:#1e40af}
+    .status-in_progress{background:#e0e7ff;color:#3730a3}
+    .status-completed{background:#d1fae5;color:#065f46}
+    .status-cancelled{background:#fee2e2;color:#991b1b}
+    .pill-public{background:#d1fae5;color:#065f46}
+    .pill-internal{background:#fee2e2;color:#991b1b}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+    .modal-content{background:var(--surface);padding:25px;border-radius:16px;max-width:900px;width:100%;max-height:90vh;overflow:auto}
+    .toast{position:fixed;right:20px;bottom:20px;background:var(--success);color:white;padding:13px 18px;border-radius:var(--radius);opacity:0;transform:translateY(80px);transition:.3s;z-index:100}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .thumb{width:55px;height:55px;object-fit:cover;border-radius:5px;margin-right:4px;border:1px solid var(--border)}
+    .whatsapp-btn{display:inline-block;background:#25d366;color:white;text-decoration:none;padding:9px 14px;border-radius:24px;margin-top:10px;font-weight:700}
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+    @media(max-width:800px){.stat-grid{grid-template-columns:1fr 1fr}}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+    .stat-card strong{display:block;font-size:1.8rem;color:var(--primary)}
+    .admin-toolbar{display:flex;gap:10px;align-items:end;justify-content:space-between;flex-wrap:wrap}
+    .detail-line{padding:10px 0;border-bottom:1px solid var(--border)}
+    .detail-line small{color:var(--text-light)}
+    .image-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .image-list img{width:90px;height:90px;object-fit:cover;border-radius:8px;border:1px solid var(--border)}
+    .info-box{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:12px;margin-bottom:14px}
+    .section-box{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:16px}
+    .section-box h3{margin-bottom:10px}
+    .update-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px}
+    .update-meta{color:var(--text-light);font-size:.85rem;margin:4px 0 8px}
+    .calc-row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--border);padding:7px 0}
+    .calc-row strong{color:var(--primary)}
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">🔧 Eure Handwerker</div>
+      <div class="nav-links">
+        <button id="btn-start" class="nav-btn" data-nav="startseite">Startseite</button>
+        <button id="btn-login" class="nav-btn" data-nav="login">Login</button>
+        <button id="btn-dashboard" class="nav-btn hidden" data-nav="dashboard">Admin Portal</button>
+        <button id="btn-logout" class="nav-btn hidden">Logout</button>
+        <button id="theme-toggle" class="nav-btn">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="view-startseite">
+      <div class="hero">
+        <h1>Eure Handwerker für Zuhause & Gewerbe</h1>
+        <p>Elektro, PV-Anlagen, Fliesenarbeiten, Malerarbeiten & mehr – sauber, zuverlässig und fair.</p>
+        <button id="btn-hero-cta">Jetzt Anfrage stellen</button>
+      </div>
+
+      <div class="grid" id="wizard-section">
+        <div class="card">
+          <h2>Anfrage stellen</h2>
+          <p style="color:var(--text-light);margin:6px 0 18px;">
+            Nach dem Absenden erstellen wir Ihr Kundenkonto und senden Ihnen die Login-Daten per E-Mail.
+          </p>
+
+          <div id="logged-customer-info" class="info-box hidden"></div>
+
+          <form id="form-anfrage">
+            <div class="form-group">
+              <label for="sel-kategorie">Kategorie *</label>
+              <select id="sel-kategorie" name="kategorie" required>
+                <option value="">Bitte wählen...</option>
+                <option value="elektro">Elektroinstallation</option>
+                <option value="pv_anlage">PV-Anlage / Solarinstallation</option>
+                <option value="fliesen">Fliesenarbeiten</option>
+                <option value="malen">Malerarbeiten</option>
+                <option value="reparatur">Reparatur / Notdienst</option>
+                <option value="sonstiges">Sonstiges</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="txt-beschreibung">Projektbeschreibung *</label>
+              <textarea id="txt-beschreibung" name="beschreibung" rows="4" required maxlength="2000" placeholder="Beschreiben Sie kurz Ihr Anliegen..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Fotos optional</label>
+              <div class="upload-area" id="upload-area">
+                <input type="file" id="inp-bilder" accept="image/jpeg,image/png,image/webp" multiple />
+                📷 Bilder auswählen oder hier ablegen
+                <div class="upload-preview" id="upload-preview"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inp-termin">Wunschtermin optional</label>
+              <input type="datetime-local" id="inp-termin" name="wunschtermin" />
+            </div>
+
+            <div id="personal-fields">
+              <div class="name-grid">
+                <div class="form-group">
+                  <label for="inp-vorname">Vorname *</label>
+                  <input type="text" id="inp-vorname" name="vorname" required maxlength="50" />
+                </div>
+                <div class="form-group">
+                  <label for="inp-nachname">Nachname *</label>
+                  <input type="text" id="inp-nachname" name="nachname" required maxlength="50" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="inp-email">E-Mail *</label>
+                <input type="email" id="inp-email" name="email" required maxlength="200" />
+                <small style="color:var(--text-light);">Ihr Passwort wird automatisch erstellt und per E-Mail gesendet.</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inp-telefon">Telefon / WhatsApp</label>
+              <input type="tel" id="inp-telefon" name="telefon" maxlength="30" />
+            </div>
+
+            <button id="btn-submit-wizard" type="submit" style="width:100%;">Anfrage senden ✓</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Über Eure Handwerker</h2>
+          <p style="margin-top:10px;">
+            Wir sind ein junges, engagiertes Team mit Fachwissen in Elektro, PV-Anlagen,
+            Fliesenarbeiten, Malerarbeiten und mehr. Wir arbeiten sauber, zuverlässig und halten Sie transparent auf dem Laufenden.
+          </p>
+          <ul style="margin-left:18px;margin-top:15px;line-height:2;">
+            <li>✅ Saubere und ordentliche Arbeit</li>
+            <li>✅ Transparente Preise</li>
+            <li>✅ Schnelle und freundliche Rückmeldung</li>
+            <li>✅ Flexible Termine</li>
+            <li>🔌 Elektro & Installation</li>
+            <li>☀️ PV-Anlagen</li>
+            <li>🧱 Fliesenarbeiten</li>
+            <li>🎨 Malerarbeiten</li>
+            <li>🛠️ Sonstige handwerkliche Arbeiten</li>
+          </ul>
+          <a href="https://wa.me/4917641659952" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+            WhatsApp: +49 176 4165 9952
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-login" class="hidden">
+      <div class="card" style="max-width:400px;margin:40px auto;">
+        <h2>Login</h2>
+        <p style="color:var(--text-light);margin-bottom:15px;">
+          Kunden nutzen ihre E-Mail und das per E-Mail zugesendete 6-stellige Passwort.
+        </p>
+        <form id="form-login">
+          <div class="form-group">
+            <label for="login-email">E-Mail</label>
+            <input type="email" id="login-email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="login-pw">Passwort</label>
+            <input type="password" id="login-pw" name="password" required />
+          </div>
+          <button type="submit" style="width:100%;">Einloggen</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="view-kunde" class="hidden">
+      <div class="card">
+        <h1 id="customer-welcome">Mein Kundenportal</h1>
+        <p id="customer-subtitle" style="color:var(--text-light);">Hier sehen Sie Ihre persönlichen Anfragen.</p>
+        <button id="btn-new-customer-request" style="margin-top:14px;">Neue Anfrage stellen</button>
+        <div class="stat-grid">
+          <div class="stat-card"><small>Ihre Anfragen</small><strong id="cust-stat-total">0</strong></div>
+          <div class="stat-card"><small>Offen</small><strong id="cust-stat-open">0</strong></div>
+          <div class="stat-card"><small>In Bearbeitung</small><strong id="cust-stat-progress">0</strong></div>
+          <div class="stat-card"><small>Abgeschlossen</small><strong id="cust-stat-completed">0</strong></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Meine Anfragen</h2>
+        <p style="color:var(--text-light);">Klicken Sie auf eine Anfrage, um Details, Zahlung, Updates und Abschluss zu sehen.</p>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Kategorie / Beschreibung</th><th>Datum</th><th>Zahlung</th><th>Status</th></tr></thead>
+            <tbody id="live-customer-requests"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-admin" class="hidden">
+      <div class="card">
+        <h1>Admin Portal</h1>
+        <p style="color:var(--text-light);">Professionelle Übersicht aller Kundenanfragen.</p>
+        <div class="stat-grid">
+          <div class="stat-card"><small>Gesamt</small><strong id="stat-total">0</strong></div>
+          <div class="stat-card"><small>Offen</small><strong id="stat-open">0</strong></div>
+          <div class="stat-card"><small>In Bearbeitung</small><strong id="stat-progress">0</strong></div>
+          <div class="stat-card"><small>Abgeschlossen</small><strong id="stat-completed">0</strong></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="admin-toolbar">
+          <div>
+            <h2>Anfragen verwalten</h2>
+            <p style="color:var(--text-light);">Klicken Sie auf eine Anfrage für Details, Updates, Material, Zeit und Zahlung.</p>
+          </div>
+          <div style="min-width:220px;">
+            <label for="admin-filter">Status filtern</label>
+            <select id="admin-filter">
+              <option value="all">Alle</option>
+              <option value="open">Offen</option>
+              <option value="accepted">Angenommen</option>
+              <option value="in_progress">In Bearbeitung</option>
+              <option value="completed">Abgeschlossen</option>
+              <option value="cancelled">Storniert</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Kunde</th><th>Kategorie</th><th>Beschreibung</th><th>Fotos</th><th>Termin</th><th>Datum</th><th>Zahlung</th><th>Status</th></tr></thead>
+            <tbody id="admin-requests-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="success-modal" class="modal hidden">
+    <div class="modal-content" style="max-width:460px;">
+      <h2>✅ Anfrage erhalten</h2>
+      <p id="success-message" style="margin:12px 0;">Danke! Wir haben Ihre Anfrage erhalten.</p>
+      <div id="success-login-box" style="background:var(--bg);padding:12px;border-radius:10px;margin:15px 0;">
+        <strong>Login E-Mail:</strong><br><span id="success-email"></span>
+      </div>
+      <button id="success-login-btn" style="width:100%;">Zum Login</button>
+      <button id="success-close-btn" class="secondary" style="width:100%;margin-top:8px;">Schließen</button>
+    </div>
+  </div>
+
+  <div id="customer-request-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Anfrage Details</h2>
+      <div class="detail-line"><small>Status</small><br><span id="cust-detail-status"></span></div>
+      <div class="detail-line"><small>Kategorie</small><br><span id="cust-detail-category"></span></div>
+
+      <div id="cust-payment-box" class="section-box hidden"></div>
+      <div id="cust-updates-box" class="section-box hidden"></div>
+      <div id="cust-completion-box" class="section-box hidden"></div>
+
+      <p id="cust-lock-info" class="info-box hidden">
+        Diese Anfrage kann nicht mehr bearbeitet werden, weil sie bereits angenommen, in Bearbeitung oder abgeschlossen ist.
+      </p>
+
+      <div class="form-group" style="margin-top:14px;">
+        <label for="cust-edit-description">Beschreibung</label>
+        <textarea id="cust-edit-description" rows="5" maxlength="2000"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="cust-edit-termin">Wunschtermin</label>
+        <input id="cust-edit-termin" type="datetime-local" />
+      </div>
+      <div class="form-group">
+        <label for="cust-edit-telefon">Telefon / WhatsApp</label>
+        <input id="cust-edit-telefon" type="tel" maxlength="30" />
+      </div>
+      <div class="detail-line">
+        <small>Gesendete Fotos</small>
+        <div id="cust-detail-images" class="image-list"></div>
+      </div>
+      <button id="cust-save-request" style="width:100%;margin-top:14px;">Änderungen speichern</button>
+      <button id="cust-close-request" class="secondary" style="width:100%;margin-top:8px;">Schließen</button>
+    </div>
+  </div>
+
+  <div id="admin-detail-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Anfrage Details</h2>
+      <div id="admin-detail-content"></div>
+
+      <div class="section-box">
+        <h3>💶 Zahlung & Preis</h3>
+        <div id="admin-payment-current"></div>
+        <div class="money-grid" style="margin-top:10px;">
+          <div class="form-group">
+            <label for="admin-billing-type">Abrechnung</label>
+            <select id="admin-billing-type">
+              <option value="fixed">Festpreis</option>
+              <option value="hourly">Stundenbasis</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="admin-fixed-price">Festpreis €</label>
+            <input id="admin-fixed-price" type="number" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label for="admin-hourly-rate">Stundensatz €</label>
+            <input id="admin-hourly-rate" type="number" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label for="admin-paid-amount">Bezahlt €</label>
+            <input id="admin-paid-amount" type="number" min="0" step="0.01" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="admin-payment-note">Zahlungsnotiz für Kunde</label>
+          <textarea id="admin-payment-note" rows="2" maxlength="600"></textarea>
+        </div>
+        <button id="admin-save-payment" style="width:100%;">Zahlung speichern</button>
+      </div>
+
+      <div class="section-box">
+        <h3>📝 Arbeitsupdate hinzufügen</h3>
+        <div class="name-grid">
+          <div class="form-group">
+            <label for="admin-update-title">Titel</label>
+            <input id="admin-update-title" maxlength="100" placeholder="z.B. Problem gefunden" />
+          </div>
+          <div class="form-group">
+            <label for="admin-update-category">Kategorie</label>
+            <select id="admin-update-category">
+              <option value="vorher">Vorher</option>
+              <option value="nachher">Nachher</option>
+              <option value="material">Material / Ersatzteile</option>
+              <option value="problem">Problemstelle</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="admin-update-visibility">Sichtbarkeit</label>
+          <select id="admin-update-visibility">
+            <option value="public">Für Kunden sichtbar</option>
+            <option value="internal">Intern</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="admin-update-description">Beschreibung</label>
+          <textarea id="admin-update-description" rows="3" maxlength="1000"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="admin-update-images">Fotos</label>
+          <input id="admin-update-images" type="file" accept="image/jpeg,image/png,image/webp" multiple />
+          <div id="admin-update-preview" class="upload-preview"></div>
+        </div>
+        <button id="admin-add-update" style="width:100%;">Update speichern</button>
+        <div id="admin-updates-list"></div>
+      </div>
+
+      <div class="section-box">
+        <h3>📦 Material / Ersatzteile</h3>
+        <div class="money-grid">
+          <div class="form-group">
+            <label for="admin-material-name">Material</label>
+            <input id="admin-material-name" maxlength="100" placeholder="z.B. Steckdose weiß" />
+          </div>
+          <div class="form-group">
+            <label for="admin-material-qty">Menge</label>
+            <input id="admin-material-qty" type="number" min="0" step="0.01" value="1" />
+          </div>
+          <div class="form-group">
+            <label for="admin-material-price">Preis je Stück € optional</label>
+            <input id="admin-material-price" type="number" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button id="admin-add-material" style="width:100%;">Material hinzufügen</button>
+          </div>
+        </div>
+        <div id="admin-material-list"></div>
+      </div>
+
+      <div class="section-box">
+        <h3>⏱️ Arbeitszeit</h3>
+        <div class="money-grid">
+          <div class="form-group">
+            <label for="admin-time-start">Start</label>
+            <input id="admin-time-start" type="datetime-local" />
+          </div>
+          <div class="form-group">
+            <label for="admin-time-end">Ende</label>
+            <input id="admin-time-end" type="datetime-local" />
+          </div>
+          <div class="form-group">
+            <label for="admin-time-pause">Pause Minuten</label>
+            <input id="admin-time-pause" type="number" min="0" step="1" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="admin-time-desc">Notiz</label>
+            <input id="admin-time-desc" maxlength="120" placeholder="z.B. Montage" />
+          </div>
+        </div>
+        <button id="admin-add-time" style="width:100%;">Arbeitszeit hinzufügen</button>
+        <div id="admin-time-list"></div>
+      </div>
+
+      <div class="section-box">
+        <h3>✅ Abschlussbericht</h3>
+        <div class="form-group">
+          <label for="admin-completion-summary">Durchgeführte Arbeiten / Abschlussnotiz</label>
+          <textarea id="admin-completion-summary" rows="4" maxlength="1500"></textarea>
+        </div>
+        <button id="admin-save-completion" style="width:100%;">Abschlussbericht speichern</button>
+      </div>
+
+      <div class="form-group" style="margin-top:14px;">
+        <label for="admin-detail-status">Status ändern</label>
+        <select id="admin-detail-status"></select>
+      </div>
+      <button id="admin-save-status" style="width:100%;">Status speichern</button>
+      <button id="admin-close-detail" class="secondary" style="width:100%;margin-top:8px;">Schließen</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"><span id="toast-msg"></span></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, setDoc, updateDoc, getDoc, serverTimestamp, query, where, orderBy, onSnapshot, doc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+    import { firebaseConfig } from "./firebase-config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const $ = id => document.getElementById(id);
+
+    const STATUS_LABELS = { open:"Offen", accepted:"Angenommen", in_progress:"In Bearbeitung", completed:"Abgeschlossen", cancelled:"Storniert" };
+    const CATEGORY_LABELS = {
+      elektro:"Elektro", pv_anlage:"PV-Anlage", fliesen:"Fliesenarbeiten",
+      malen:"Malerarbeiten", reparatur:"Reparatur / Notdienst", sonstiges:"Sonstiges", sanitaer:"Sanitär & Bad"
+    };
+    const UPDATE_LABELS = { vorher:"Vorher", nachher:"Nachher", material:"Material / Ersatzteile", problem:"Problemstelle" };
+
+    let currentUser = null, currentUserData = null, customerUnsub = null, adminUnsub = null;
+    let isSubmittingAnfrage = false, selectedCustomerRequestId = null, selectedCustomerRequestData = null;
+    let selectedAdminRequestId = null, selectedAdminRequestData = null, latestAdminDocs = [];
+
+    function esc(v){return String(v ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+    function generateSixDigitPassword(){const a=new Uint32Array(1);crypto.getRandomValues(a);return String(a[0]%1000000).padStart(6,"0");}
+    function toast(msg,type="success"){ $("toast-msg").textContent=msg; $("toast").style.background=type==="error"?"var(--danger)":"var(--success)"; $("toast").classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>$("toast").classList.remove("show"),3500); }
+    function showView(name){document.querySelectorAll("[id^='view-']").forEach(v=>v.classList.add("hidden")); $("view-"+name).classList.remove("hidden"); window.scrollTo(0,0); if(name==="startseite") syncAnfrageIdentityFields();}
+    function fmtDate(value){if(!value)return"—"; const d=value.toDate?value.toDate():new Date(value); return d.toLocaleDateString("de-DE");}
+    function fmtDateTime(value){if(!value)return"—"; const d=value.toDate?value.toDate():new Date(value); return d.toLocaleString("de-DE");}
+    function euro(v){return Number(v || 0).toLocaleString("de-DE",{style:"currency",currency:"EUR"});}
+    function materialTotal(d){return (d.materialItems||[]).reduce((s,m)=>s+(Number(m.qty||0)*Number(m.price||0)),0);}
+    function totalHours(d){return (d.timeEntries||[]).reduce((s,t)=>s+Number(t.hours||0),0);}
+    function baseTotal(d){return d.billingType==="hourly" ? totalHours(d)*Number(d.hourlyRate||0) : Number(d.fixedPrice||0);}
+    function grandTotal(d){return baseTotal(d)+materialTotal(d);}
+    function remainingAmount(d){return Math.max(0, grandTotal(d)-Number(d.paidAmount||0));}
+    function paymentShort(d){return grandTotal(d) ? `${euro(remainingAmount(d))} offen` : "—";}
+
+    function paymentHtml(d){
+      const type = d.billingType==="hourly" ? "Stundenbasis" : "Festpreis";
+      return `
+        <div class="calc-row"><span>Abrechnung</span><strong>${esc(type)}</strong></div>
+        <div class="calc-row"><span>Arbeit</span><span>${euro(baseTotal(d))}</span></div>
+        <div class="calc-row"><span>Material</span><span>${euro(materialTotal(d))}</span></div>
+        <div class="calc-row"><span>Gesamt</span><strong>${euro(grandTotal(d))}</strong></div>
+        <div class="calc-row"><span>Bezahlt</span><span>${euro(d.paidAmount || 0)}</span></div>
+        <div class="calc-row"><span>Restbetrag</span><strong>${euro(remainingAmount(d))}</strong></div>
+        ${d.billingType==="hourly" ? `<div class="calc-row"><span>Stunden</span><span>${totalHours(d).toFixed(2)} h × ${euro(d.hourlyRate || 0)}</span></div>` : ""}
+        ${d.paymentNote ? `<p style="margin-top:10px;"><strong>Notiz:</strong><br>${esc(d.paymentNote).replace(/\n/g,"<br>")}</p>` : ""}
+      `;
+    }
+
+    function syncAuthButtons(){
+      const logged=!!currentUser, admin=logged && currentUserData?.role==="admin";
+      $("btn-start").classList.toggle("hidden", admin);
+      $("btn-login").classList.toggle("hidden", logged || admin);
+      $("btn-logout").classList.toggle("hidden", !logged);
+      $("btn-dashboard").classList.toggle("hidden", !admin);
+      if(isSubmittingAnfrage){$("btn-login").classList.add("hidden");$("btn-logout").classList.add("hidden");$("btn-dashboard").classList.add("hidden");}
+    }
+
+    function syncAnfrageIdentityFields(){
+      const isCustomer = currentUser && currentUserData?.role !== "admin";
+      $("personal-fields").classList.toggle("hidden", !!isCustomer);
+      $("logged-customer-info").classList.toggle("hidden", !isCustomer);
+      if (!isCustomer) return;
+
+      const vorname = currentUserData?.vorname || (currentUserData?.name || "").split(" ")[0] || "";
+      const nachname = currentUserData?.nachname || (currentUserData?.name || "").split(" ").slice(1).join(" ") || "";
+      const email = currentUserData?.email || currentUser.email || "";
+      const fullName = `${vorname} ${nachname}`.trim() || currentUserData?.name || email;
+
+      $("inp-vorname").value = vorname || fullName;
+      $("inp-nachname").value = nachname || "-";
+      $("inp-email").value = email;
+      $("logged-customer-info").innerHTML = `Sie sind eingeloggt als <strong>${esc(fullName)}</strong> (${esc(email)}).<br>Für diese Anfrage müssen Sie Name und E-Mail nicht erneut eingeben.`;
+    }
+
+    async function loadUserData(user){
+      const snap = await getDoc(doc(db,"users",user.uid));
+      return snap.exists() ? snap.data() : { role:"kunde", name:user.email, email:user.email };
+    }
+
+    async function ensureCustomerAccount(email,password,name,vorname,nachname){
+      if(currentUser && currentUser.email === email) return { user:currentUser, passwordForEmail:null, existingLoggedIn:true };
+      const cred = await createUserWithEmailAndPassword(auth,email,password);
+      await setDoc(doc(db,"users",cred.user.uid),{ role:"kunde", name, vorname, nachname, email, createdAt:serverTimestamp() },{ merge:true });
+      return { user:cred.user, passwordForEmail:password, existingLoggedIn:false };
+    }
+
+    async function queueFriendlyEmail(email,name,password){
+      const passwordLine = password ? `Passwort: ${password}` : "Passwort: Ihr bestehendes Passwort";
+      await addDoc(collection(db,"mail"),{
+        to:email,
+        message:{
+          subject:"Ihre Anfrage ist bei Eure Handwerker angekommen",
+          text:`Hallo ${name},\n\nvielen Dank für Ihre Anfrage. Wir haben alles erhalten und melden uns so schnell wie möglich bei Ihnen.\n\nLogin:\nE-Mail: ${email}\n${passwordLine}\n\nViele Grüße\nEure Handwerker`,
+          html:`<div style="font-family:Arial,sans-serif;line-height:1.6;color:#334155"><h2>Hallo ${esc(name)},</h2><p>vielen Dank für Ihre Anfrage. Wir haben alles erhalten und melden uns so schnell wie möglich bei Ihnen.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin:18px 0"><strong>Login:</strong><br>E-Mail: ${esc(email)}<br>${esc(passwordLine)}</div><p>Viele Grüße<br>Eure Handwerker</p></div>`
+        },
+        createdAt:serverTimestamp()
+      });
+    }
+
+    async function queueUpdateEmail(anfrage, update){
+      if(!anfrage?.email || update.visibility !== "public") return;
+      await addDoc(collection(db,"mail"),{
+        to:anfrage.email,
+        message:{
+          subject:"Neues Update zu Ihrer Anfrage",
+          text:`Hallo ${anfrage.name || ""},\n\nes gibt ein neues Update zu Ihrer Anfrage:\n\n${update.title}\n${update.description}\n\nBitte loggen Sie sich in Ihr Kundenportal ein.\n\nViele Grüße\nEure Handwerker`,
+          html:`<div style="font-family:Arial,sans-serif;line-height:1.6;color:#334155"><h2>Neues Update zu Ihrer Anfrage</h2><p><strong>${esc(update.title)}</strong></p><p>${esc(update.description).replace(/\n/g,"<br>")}</p><p>Bitte loggen Sie sich in Ihr Kundenportal ein.</p><p>Viele Grüße<br>Eure Handwerker</p></div>`
+        },
+        createdAt:serverTimestamp()
+      });
+    }
+
+    document.querySelectorAll("[data-nav]").forEach(btn=>{
+      btn.onclick=()=>{
+        if(btn.dataset.nav==="startseite") showView("startseite");
+        if(btn.dataset.nav==="login") showView("login");
+        if(btn.dataset.nav==="dashboard" && currentUserData?.role==="admin") showView("admin");
+      };
+    });
+
+    $("btn-hero-cta").onclick=()=>$("wizard-section").scrollIntoView({behavior:"smooth"});
+    $("btn-new-customer-request").onclick=()=>{showView("startseite"); $("wizard-section").scrollIntoView({behavior:"smooth"});};
+    $("theme-toggle").onclick=()=>{const dark=document.documentElement.getAttribute("data-theme")==="dark"; document.documentElement.setAttribute("data-theme",dark?"light":"dark"); $("theme-toggle").textContent=dark?"🌙":"☀️";};
+    $("btn-logout").onclick=async()=>{if(customerUnsub)customerUnsub(); if(adminUnsub)adminUnsub(); await signOut(auth); toast("Abgemeldet");};
+
+    $("upload-area").onclick=()=>$("inp-bilder").click();
+    $("inp-bilder").onchange=()=>{
+      $("upload-preview").innerHTML="";
+      Array.from($("inp-bilder").files).slice(0,5).forEach(file=>{
+        if(!file.type.match("image/(jpeg|png|webp)"))return;
+        const img=document.createElement("img"); img.src=URL.createObjectURL(file); $("upload-preview").appendChild(img);
+      });
+    };
+
+    $("admin-update-images").onchange=()=>{
+      $("admin-update-preview").innerHTML="";
+      Array.from($("admin-update-images").files).slice(0,8).forEach(file=>{
+        if(!file.type.match("image/(jpeg|png|webp)"))return;
+        const img=document.createElement("img"); img.src=URL.createObjectURL(file); $("admin-update-preview").appendChild(img);
+      });
+    };
+
+    $("form-anfrage").onsubmit=async e=>{
+      e.preventDefault();
+      syncAnfrageIdentityFields();
+
+      const btn=$("btn-submit-wizard"), fd=new FormData(e.target);
+      const kategorie=fd.get("kategorie"), beschreibung=fd.get("beschreibung").trim();
+      const vorname=$("inp-vorname").value.trim(), nachname=$("inp-nachname").value.trim();
+      const name=`${vorname} ${nachname}`.replace(" -","").trim();
+      const email=$("inp-email").value.trim().toLowerCase();
+      const telefon=($("inp-telefon").value||"").trim().slice(0,30);
+
+      if(!kategorie || beschreibung.length<10 || vorname.length<1 || nachname.length<1 || !email.includes("@")){
+        toast("Bitte alle Pflichtfelder korrekt ausfüllen.","error"); return;
+      }
+
+      btn.disabled=true; btn.textContent="Anfrage wird gesendet..."; isSubmittingAnfrage=true; syncAuthButtons();
+
+      try{
+        const account = await ensureCustomerAccount(email, generateSixDigitPassword(), name, vorname, nachname);
+        const user = account.user;
+        const imageUrls=[];
+
+        for(const file of Array.from($("inp-bilder").files).slice(0,5)){
+          if(!file.type.match("image/(jpeg|png|webp)"))continue;
+          const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+          const storageRef=ref(storage,`anfragen/${user.uid}/${Date.now()}_${safeName}`);
+          await uploadBytes(storageRef,file);
+          imageUrls.push(await getDownloadURL(storageRef));
+        }
+
+        await addDoc(collection(db,"anfragen"),{
+          kundeId:user.uid,kategorie,beschreibung,vorname,nachname,name,email,telefon,
+          wunschtermin:fd.get("wunschtermin")||"",bilder:imageUrls,bilderCleanedAt:null,
+          status:"open",completedAt:null,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),
+          workUpdates:[],materialItems:[],timeEntries:[],statusTimeline:[{text:"Anfrage erstellt",date:new Date().toISOString(),public:true}]
+        });
+
+        await queueFriendlyEmail(email,name,account.passwordForEmail);
+        e.target.reset(); $("upload-preview").innerHTML="";
+
+        if(account.existingLoggedIn){
+          toast("Ihre neue Anfrage wurde gesendet.");
+          syncAnfrageIdentityFields();
+          showView("kunde");
+        }else{
+          await signOut(auth);
+          currentUser=null; currentUserData=null;
+          $("success-message").textContent="Danke! Wir haben Ihre Anfrage erhalten und Ihnen die Login-Daten per E-Mail geschickt.";
+          $("success-email").textContent=email;
+          $("success-login-box").classList.remove("hidden");
+          $("success-login-btn").classList.remove("hidden");
+          $("success-modal").classList.remove("hidden");
+          showView("startseite");
+        }
+      }catch(err){
+        toast(err.code==="auth/email-already-in-use" ? "Für diese E-Mail existiert bereits ein Konto. Bitte loggen Sie sich ein." : (err.message || "Fehler beim Senden der Anfrage."),"error");
+      }finally{
+        isSubmittingAnfrage=false; syncAuthButtons(); btn.disabled=false; btn.textContent="Anfrage senden ✓";
+      }
+    };
+
+    $("form-login").onsubmit=async e=>{
+      e.preventDefault();
+      const btn=e.target.querySelector("button"); btn.disabled=true;
+      try{await signInWithEmailAndPassword(auth,e.target.email.value.trim().toLowerCase(),e.target.password.value); toast("Eingeloggt");}
+      catch{toast("Login fehlgeschlagen. Bitte E-Mail und Passwort prüfen.","error");}
+      finally{btn.disabled=false;}
+    };
+
+    $("success-login-btn").onclick=()=>{$("success-modal").classList.add("hidden"); $("login-email").value=$("success-email").textContent; showView("login");};
+    $("success-close-btn").onclick=()=>$("success-modal").classList.add("hidden");
+
+    function imageHtml(urls){return(urls||[]).map(url=>`<img src="${esc(url)}" alt="Foto">`).join("")||"—";}
+    function updateCustomerHeader(items){
+      const name=currentUserData?.vorname || currentUserData?.name || currentUser?.email || "";
+      $("customer-welcome").textContent=`Willkommen, ${name}`;
+      $("customer-subtitle").textContent="Hier sehen Sie Ihre Anfragen, Updates, Zahlungen und Abschlussbestätigungen.";
+      $("cust-stat-total").textContent=items.length;
+      $("cust-stat-open").textContent=items.filter(x=>x.status==="open").length;
+      $("cust-stat-progress").textContent=items.filter(x=>x.status==="in_progress").length;
+      $("cust-stat-completed").textContent=items.filter(x=>x.status==="completed").length;
+    }
+
+    function renderCustomer(){
+      if(!currentUser)return;
+      const tbody=$("live-customer-requests");
+      tbody.innerHTML='<tr><td colspan="4">Lade Daten...</td></tr>';
+      const q=query(collection(db,"anfragen"),where("kundeId","==",currentUser.uid));
+      customerUnsub=onSnapshot(q,snapshot=>{
+        const items=snapshot.docs.map(ds=>({id:ds.id,...ds.data()}));
+        updateCustomerHeader(items); tbody.innerHTML="";
+        if(!items.length){tbody.innerHTML='<tr><td colspan="4">Noch keine Anfragen gefunden.</td></tr>';return;}
+        items.forEach(d=>{
+          const tr=document.createElement("tr"); tr.className="clickable-row";
+          tr.innerHTML=`<td><strong>${esc(CATEGORY_LABELS[d.kategorie]||d.kategorie)}</strong><br><small>${esc((d.beschreibung||"").slice(0,90))}${(d.beschreibung||"").length>90?"...":""}</small></td><td>${fmtDate(d.createdAt)}</td><td>${esc(paymentShort(d))}</td><td><span class="status-badge status-${esc(d.status)}">${esc(STATUS_LABELS[d.status]||d.status)}</span></td>`;
+          tr.onclick=()=>openCustomerRequest(d.id,d); tbody.appendChild(tr);
+        });
+      },err=>toast("Firestore Fehler: "+err.message,"error"));
+    }
+
+    function renderCustomerPayment(d){
+      const box=$("cust-payment-box");
+      if(!grandTotal(d) && !(d.paymentNote)){box.classList.add("hidden");box.innerHTML="";return;}
+      box.classList.remove("hidden");
+      box.innerHTML=`<h3>💶 Zahlung</h3>${paymentHtml(d)}`;
+    }
+
+    function renderCustomerUpdates(d){
+      const updates=(d.workUpdates||[]).filter(u=>u.visibility==="public");
+      const timeline=(d.statusTimeline||[]).filter(t=>t.public !== false);
+      const box=$("cust-updates-box");
+      if(!updates.length && !timeline.length){box.classList.add("hidden");box.innerHTML="";return;}
+      box.classList.remove("hidden");
+      box.innerHTML=`<h3>📌 Updates & Verlauf</h3>` + timeline.map(t=>`
+        <div class="update-card">
+          <strong>${esc(t.text)}</strong>
+          <div class="update-meta">${fmtDateTime(t.date)}</div>
+        </div>
+      `).join("") + updates.map(u=>`
+        <div class="update-card">
+          <span class="pill pill-public">${esc(UPDATE_LABELS[u.category]||u.category)}</span>
+          <h4 style="margin-top:8px;">${esc(u.title)}</h4>
+          <div class="update-meta">${fmtDateTime(u.date)}</div>
+          <p>${esc(u.description||"").replace(/\n/g,"<br>")}</p>
+          <div class="image-list">${imageHtml(u.images)}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderCustomerCompletion(d){
+      const box=$("cust-completion-box");
+      if(d.status!=="completed" && !d.completionSummary){box.classList.add("hidden");box.innerHTML="";return;}
+      const name=currentUserData?.name || `${currentUserData?.vorname||""} ${currentUserData?.nachname||""}`.trim() || currentUser?.email || "";
+      box.classList.remove("hidden");
+      box.innerHTML=`
+        <h3>✅ Abschluss</h3>
+        ${d.completionSummary ? `<p>${esc(d.completionSummary).replace(/\n/g,"<br>")}</p>` : "<p>Die Arbeit wurde als abgeschlossen markiert.</p>"}
+        ${d.customerApproved ? `
+          <div class="info-box" style="margin-top:10px;">Bestätigt von <strong>${esc(d.customerApprovalName||"Kunde")}</strong> am ${fmtDateTime(d.customerApprovedAt)}.</div>
+        ` : `
+          <p style="margin-top:10px;color:var(--text-light);">Mit Klick auf Bestätigen wird automatisch Ihr Name als Bestätigung gespeichert: <strong>${esc(name)}</strong></p>
+          <button id="cust-approve-completion" class="success" style="width:100%;margin-top:8px;">Arbeit bestätigen</button>
+        `}
+      `;
+      if(!d.customerApproved){
+        $("cust-approve-completion").onclick=async()=>{
+          await updateDoc(doc(db,"anfragen",selectedCustomerRequestId),{
+            customerApproved:true,
+            customerApprovalName:name,
+            customerApprovedAt:new Date().toISOString(),
+            updatedAt:serverTimestamp()
+          });
+          $("customer-request-modal").classList.add("hidden");
+          toast("Abschluss bestätigt. Danke!");
+        };
+      }
+    }
+
+    function openCustomerRequest(id,data){
+      selectedCustomerRequestId=id;
+      selectedCustomerRequestData=data;
+      const editable=data.status==="open";
+
+      $("cust-detail-status").innerHTML=`<span class="status-badge status-${esc(data.status)}">${esc(STATUS_LABELS[data.status]||data.status)}</span>`;
+      $("cust-detail-category").textContent=CATEGORY_LABELS[data.kategorie]||data.kategorie||"—";
+      $("cust-edit-description").value=data.beschreibung||"";
+      $("cust-edit-termin").value=data.wunschtermin||"";
+      $("cust-edit-telefon").value=data.telefon||"";
+      $("cust-detail-images").innerHTML=imageHtml(data.bilder);
+
+      $("cust-edit-description").disabled=!editable;
+      $("cust-edit-termin").disabled=!editable;
+      $("cust-edit-telefon").disabled=!editable;
+      $("cust-save-request").classList.toggle("hidden",!editable);
+      $("cust-lock-info").classList.toggle("hidden",editable);
+
+      renderCustomerPayment(data);
+      renderCustomerUpdates(data);
+      renderCustomerCompletion(data);
+      $("customer-request-modal").classList.remove("hidden");
+    }
+
+    $("cust-close-request").onclick=()=>$("customer-request-modal").classList.add("hidden");
+    $("cust-save-request").onclick=async()=>{
+      if(!selectedCustomerRequestId || selectedCustomerRequestData?.status!=="open"){
+        toast("Diese Anfrage kann nicht mehr bearbeitet werden.","error");return;
+      }
+      const beschreibung=$("cust-edit-description").value.trim();
+      if(beschreibung.length<10){toast("Beschreibung muss mindestens 10 Zeichen haben.","error");return;}
+      try{
+        await updateDoc(doc(db,"anfragen",selectedCustomerRequestId),{
+          beschreibung,wunschtermin:$("cust-edit-termin").value||"",telefon:$("cust-edit-telefon").value.trim().slice(0,30),updatedAt:serverTimestamp()
+        });
+        $("customer-request-modal").classList.add("hidden"); toast("Anfrage aktualisiert");
+      }catch{toast("Änderung nicht erlaubt oder Firebase Fehler.","error");}
+    };
+
+    function updateAdminStats(items){
+      $("stat-total").textContent=items.length;
+      $("stat-open").textContent=items.filter(x=>x.data.status==="open").length;
+      $("stat-progress").textContent=items.filter(x=>x.data.status==="in_progress").length;
+      $("stat-completed").textContent=items.filter(x=>x.data.status==="completed").length;
+    }
+
+    function renderAdminTable(){
+      const tbody=$("admin-requests-table"), filter=$("admin-filter").value;
+      const rows=filter==="all"?latestAdminDocs:latestAdminDocs.filter(x=>x.data.status===filter);
+      tbody.innerHTML="";
+      if(!rows.length){tbody.innerHTML='<tr><td colspan="8">Keine passenden Anfragen vorhanden.</td></tr>';return;}
+      rows.forEach(({id,data:d})=>{
+        const tr=document.createElement("tr"); tr.className="clickable-row";
+        const thumbs=(d.bilder||[]).map(url=>`<img class="thumb" src="${esc(url)}" alt="Foto">`).join("")||"—";
+        tr.innerHTML=`<td><strong>${esc(d.name||"—")}</strong><br><small>${esc(d.email||"")}</small><br><small>${esc(d.telefon||"")}</small></td><td>${esc(CATEGORY_LABELS[d.kategorie]||d.kategorie||"—")}</td><td>${esc((d.beschreibung||"").slice(0,100))}${(d.beschreibung||"").length>100?"...":""}<br><small>Updates: ${(d.workUpdates||[]).length} · Material: ${(d.materialItems||[]).length}</small></td><td>${thumbs}</td><td>${d.wunschtermin?new Date(d.wunschtermin).toLocaleString("de-DE"):"—"}</td><td>${fmtDate(d.createdAt)}</td><td>${esc(paymentShort(d))}</td><td></td>`;
+        const select=document.createElement("select");
+        Object.entries(STATUS_LABELS).forEach(([value,label])=>{const opt=document.createElement("option"); opt.value=value; opt.textContent=label; opt.selected=d.status===value; select.appendChild(opt);});
+        select.onclick=ev=>ev.stopPropagation();
+        select.onchange=async ev=>{
+          ev.stopPropagation();
+          try{
+            await updateDoc(doc(db,"anfragen",id),{
+              status:select.value,
+              completedAt:select.value==="completed"?serverTimestamp():null,
+              updatedAt:serverTimestamp(),
+              statusTimeline:arrayUnion({text:`Status geändert zu ${STATUS_LABELS[select.value]}`,date:new Date().toISOString(),public:true})
+            });
+            toast("Status geändert");
+          }catch{toast("Keine Admin-Rechte oder Firebase Fehler.","error"); select.value=d.status;}
+        };
+        tr.onclick=()=>openAdminDetail(id,d); tr.children[7].appendChild(select); tbody.appendChild(tr);
+      });
+    }
+
+    function renderAdmin(){
+      $("admin-requests-table").innerHTML='<tr><td colspan="8">Lade Daten...</td></tr>';
+      const q=query(collection(db,"anfragen"),orderBy("createdAt","desc"));
+      adminUnsub=onSnapshot(q,snapshot=>{
+        latestAdminDocs=snapshot.docs.map(ds=>({id:ds.id,data:ds.data()}));
+        updateAdminStats(latestAdminDocs); renderAdminTable();
+        if(selectedAdminRequestId){
+          const fresh=latestAdminDocs.find(x=>x.id===selectedAdminRequestId);
+          if(fresh && !$("admin-detail-modal").classList.contains("hidden")){
+            selectedAdminRequestData=fresh.data;
+            fillAdminDynamicSections(fresh.data);
+          }
+        }
+      },err=>toast("Firestore Fehler: "+err.message,"error"));
+    }
+
+    $("admin-filter").onchange=renderAdminTable;
+
+    function fillAdminDynamicSections(d){
+      $("admin-billing-type").value=d.billingType||"fixed";
+      $("admin-fixed-price").value=d.fixedPrice||"";
+      $("admin-hourly-rate").value=d.hourlyRate||"";
+      $("admin-paid-amount").value=d.paidAmount||"";
+      $("admin-payment-note").value=d.paymentNote||"";
+      $("admin-payment-current").innerHTML=paymentHtml(d);
+
+      $("admin-updates-list").innerHTML=(d.workUpdates||[]).slice().reverse().map(u=>`
+        <div class="update-card">
+          <span class="pill ${u.visibility==="public"?"pill-public":"pill-internal"}">${u.visibility==="public"?"Für Kunden sichtbar":"Intern"}</span>
+          <span class="pill">${esc(UPDATE_LABELS[u.category]||u.category)}</span>
+          <h4 style="margin-top:8px;">${esc(u.title)}</h4>
+          <div class="update-meta">${fmtDateTime(u.date)}</div>
+          <p>${esc(u.description||"").replace(/\n/g,"<br>")}</p>
+          <div class="image-list">${imageHtml(u.images)}</div>
+        </div>
+      `).join("") || '<p style="color:var(--text-light);">Noch keine Arbeitsupdates.</p>';
+
+      $("admin-material-list").innerHTML=(d.materialItems||[]).length ? `
+        <table><thead><tr><th>Material</th><th>Menge</th><th>Preis</th><th>Gesamt</th></tr></thead><tbody>
+          ${(d.materialItems||[]).map(m=>`<tr><td>${esc(m.name)}</td><td>${Number(m.qty||0)}</td><td>${euro(m.price||0)}</td><td>${euro(Number(m.qty||0)*Number(m.price||0))}</td></tr>`).join("")}
+        </tbody></table>
+      ` : '<p style="color:var(--text-light);">Noch kein Material eingetragen.</p>';
+
+      $("admin-time-list").innerHTML=(d.timeEntries||[]).length ? `
+        <table><thead><tr><th>Datum</th><th>Zeit</th><th>Pause</th><th>Stunden</th><th>Notiz</th></tr></thead><tbody>
+          ${(d.timeEntries||[]).map(t=>`<tr><td>${fmtDate(t.start)}</td><td>${fmtDateTime(t.start)} - ${fmtDateTime(t.end)}</td><td>${Number(t.pauseMinutes||0)} min</td><td>${Number(t.hours||0).toFixed(2)}</td><td>${esc(t.description||"")}</td></tr>`).join("")}
+        </tbody></table>
+      ` : '<p style="color:var(--text-light);">Noch keine Arbeitszeit eingetragen.</p>';
+
+      $("admin-completion-summary").value=d.completionSummary||"";
+    }
+
+    function openAdminDetail(id,d){
+      selectedAdminRequestId=id;
+      selectedAdminRequestData=d;
+      $("admin-detail-content").innerHTML=`<div class="detail-line"><small>Kunde</small><br><strong>${esc(d.name||"—")}</strong><br>${esc(d.email||"")}<br>${esc(d.telefon||"")}</div><div class="detail-line"><small>Kategorie</small><br>${esc(CATEGORY_LABELS[d.kategorie]||d.kategorie||"—")}</div><div class="detail-line"><small>Beschreibung</small><br>${esc(d.beschreibung||"—").replace(/\n/g,"<br>")}</div><div class="detail-line"><small>Wunschtermin</small><br>${d.wunschtermin?new Date(d.wunschtermin).toLocaleString("de-DE"):"—"}</div><div class="detail-line"><small>Abschluss bestätigt</small><br>${d.customerApproved?`Ja, von ${esc(d.customerApprovalName||"Kunde")} am ${fmtDateTime(d.customerApprovedAt)}`:"Nein"}</div><div class="detail-line"><small>Fotos</small><div class="image-list">${imageHtml(d.bilder)}</div></div>`;
+      $("admin-detail-status").innerHTML="";
+      Object.entries(STATUS_LABELS).forEach(([value,label])=>{const opt=document.createElement("option"); opt.value=value; opt.textContent=label; opt.selected=d.status===value; $("admin-detail-status").appendChild(opt);});
+      fillAdminDynamicSections(d);
+      $("admin-detail-modal").classList.remove("hidden");
+    }
+
+    $("admin-save-payment").onclick=async()=>{
+      if(!selectedAdminRequestId)return;
+      try{
+        await updateDoc(doc(db,"anfragen",selectedAdminRequestId),{
+          billingType:$("admin-billing-type").value,
+          fixedPrice:Number($("admin-fixed-price").value||0),
+          hourlyRate:Number($("admin-hourly-rate").value||0),
+          paidAmount:Number($("admin-paid-amount").value||0),
+          paymentNote:$("admin-payment-note").value.trim().slice(0,600),
+          updatedAt:serverTimestamp(),
+          statusTimeline:arrayUnion({text:"Zahlungsinformationen aktualisiert",date:new Date().toISOString(),public:true})
+        });
+        toast("Zahlung gespeichert");
+      }catch{toast("Zahlung konnte nicht gespeichert werden.","error");}
+    };
+
+    $("admin-add-update").onclick=async()=>{
+      if(!selectedAdminRequestId || !selectedAdminRequestData)return;
+      const title=$("admin-update-title").value.trim();
+      const description=$("admin-update-description").value.trim();
+      if(title.length<2 || description.length<3){toast("Bitte Titel und Beschreibung eingeben.","error");return;}
+
+      $("admin-add-update").disabled=true;
+      try{
+        const images=[];
+        for(const file of Array.from($("admin-update-images").files).slice(0,8)){
+          if(!file.type.match("image/(jpeg|png|webp)"))continue;
+          const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+          const storageRef=ref(storage,`jobUpdates/${selectedAdminRequestId}/${Date.now()}_${safeName}`);
+          await uploadBytes(storageRef,file);
+          images.push(await getDownloadURL(storageRef));
+        }
+
+        const update={
+          id:crypto.randomUUID(),
+          title,
+          description,
+          category:$("admin-update-category").value,
+          visibility:$("admin-update-visibility").value,
+          images,
+          date:new Date().toISOString(),
+          createdBy:currentUser.uid
+        };
+
+        await updateDoc(doc(db,"anfragen",selectedAdminRequestId),{
+          workUpdates:arrayUnion(update),
+          updatedAt:serverTimestamp(),
+          statusTimeline:arrayUnion({text:`Arbeitsupdate hinzugefügt: ${title}`,date:new Date().toISOString(),public:update.visibility==="public"})
+        });
+
+        await queueUpdateEmail(selectedAdminRequestData,update);
+
+        $("admin-update-title").value="";
+        $("admin-update-description").value="";
+        $("admin-update-images").value="";
+        $("admin-update-preview").innerHTML="";
+        toast("Arbeitsupdate gespeichert");
+      }catch(err){
+        toast(err.message || "Update konnte nicht gespeichert werden.","error");
+      }finally{
+        $("admin-add-update").disabled=false;
+      }
+    };
+
+    $("admin-add-material").onclick=async()=>{
+      if(!selectedAdminRequestId)return;
+      const name=$("admin-material-name").value.trim();
+      const qty=Number($("admin-material-qty").value||0);
+      const price=Number($("admin-material-price").value||0);
+      if(!name || qty<=0){toast("Bitte Material und Menge eingeben.","error");return;}
+      const item={id:crypto.randomUUID(),name,qty,price,date:new Date().toISOString()};
+      try{
+        await updateDoc(doc(db,"anfragen",selectedAdminRequestId),{
+          materialItems:arrayUnion(item),
+          updatedAt:serverTimestamp(),
+          statusTimeline:arrayUnion({text:`Material hinzugefügt: ${name}`,date:new Date().toISOString(),public:false})
+        });
+        $("admin-material-name").value="";
+        $("admin-material-qty").value="1";
+        $("admin-material-price").value="";
+        toast("Material hinzugefügt");
+      }catch{toast("Material konnte nicht gespeichert werden.","error");}
+    };
+
+    function calcHours(start,end,pauseMinutes){
+      const s=new Date(start).getTime(), e=new Date(end).getTime();
+      if(!s || !e || e<=s)return 0;
+      return Math.max(0,(e-s)/3600000 - Number(pauseMinutes||0)/60);
+    }
+
+    $("admin-add-time").onclick=async()=>{
+      if(!selectedAdminRequestId)return;
+      const start=$("admin-time-start").value;
+      const end=$("admin-time-end").value;
+      const pauseMinutes=Number($("admin-time-pause").value||0);
+      const hours=calcHours(start,end,pauseMinutes);
+      if(hours<=0){toast("Bitte gültige Start- und Endzeit eingeben.","error");return;}
+      const entry={id:crypto.randomUUID(),start,end,pauseMinutes,hours,description:$("admin-time-desc").value.trim().slice(0,120),date:new Date().toISOString()};
+      try{
+        await updateDoc(doc(db,"anfragen",selectedAdminRequestId),{
+          timeEntries:arrayUnion(entry),
+          updatedAt:serverTimestamp(),
+          statusTimeline:arrayUnion({text:`Arbeitszeit hinzugefügt: ${hours.toFixed(2)} Stunden`,date:new Date().toISOString(),public:false})
+        });
+        $("admin-time-start").value="";
+        $("admin-time-end").value="";
+        $("admin-time-pause").value="0";
+        $("admin-time-desc").value="";
+        toast("Arbeitszeit gespeichert");
+      }catch{toast("Arbeitszeit konnte nicht gespeichert werden.","error");}
+    };
+
+    $("admin-save-completion").onclick=async()=>{
+      if(!selectedAdminRequestId)return;
+      try{
+        await updateDoc(doc(db,"anfragen",selectedAdminRequestId),{
+          completionSummary:$("admin-completion-summary").value.trim().slice(0,1500),
+          updatedAt:serverTimestamp(),
+          statusTimeline:arrayUnion({text:"Abschlussbericht aktualisiert",date:new Date().toISOString(),public:true})
+        });
+        toast("Abschlussbericht gespeichert");
+      }catch{toast("Abschlussbericht konnte nicht gespeichert werden.","error");}
+    };
+
+    $("admin-close-detail").onclick=()=>$("admin-detail-modal").classList.add("hidden");
+    $("admin-save-status").onclick=async()=>{
+      if(!selectedAdminRequestId)return;
+      const status=$("admin-detail-status").value;
+      try{
+        await updateDoc(doc(db,"anfragen",selectedAdminRequestId),{
+          status,
+          completedAt:status==="completed"?serverTimestamp():null,
+          updatedAt:serverTimestamp(),
+          statusTimeline:arrayUnion({text:`Status geändert zu ${STATUS_LABELS[status]}`,date:new Date().toISOString(),public:true})
+        });
+        $("admin-detail-modal").classList.add("hidden"); toast("Status gespeichert");
+      }catch{toast("Keine Admin-Rechte oder Firebase Fehler.","error");}
+    };
+
+    onAuthStateChanged(auth,async user=>{
+      currentUser=user;
+      if(isSubmittingAnfrage){syncAuthButtons();return;}
+      if(customerUnsub)customerUnsub(); if(adminUnsub)adminUnsub();
+
+      if(!user){
+        currentUserData=null; syncAuthButtons(); syncAnfrageIdentityFields(); showView("startseite"); return;
+      }
+
+      currentUserData=await loadUserData(user);
+      syncAuthButtons(); syncAnfrageIdentityFields();
+
+      if(currentUserData.role==="admin"){showView("admin"); renderAdmin();}
+      else{showView("kunde"); renderCustomer();}
+    });
+
+    showView("startseite");
+  </script>
+</body>
+</html>

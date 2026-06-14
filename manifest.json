@@ -1,0 +1,17 @@
+{
+  "short_name": "Eure Handwerker",
+  "name": "Eure Handwerker",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23f59e0b' width='192' height='192'/><path fill='white' d='M96 48l40 40-24 24-24-24 24-24-16-16z M48 144l40-40'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#f8fafc",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#0f172a",
+  "description": "Eure Handwerker für Elektro, PV-Anlagen, Fliesenarbeiten, Malerarbeiten und mehr"
+}
