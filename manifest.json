@@ -8,10 +8,10 @@
       "type": "image/svg+xml"
     }
   ],
-  "start_url": "/",
+  "start_url": "./",
   "background_color": "#f8fafc",
   "display": "standalone",
-  "scope": "/",
+  "scope": "./",
   "theme_color": "#0f172a",
   "description": "Eure Handwerker für Elektro, PV-Anlagen, Fliesenarbeiten, Malerarbeiten und mehr"
 }
