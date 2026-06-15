@@ -1,9 +1,11 @@
-const CACHE_NAME = 'eure-handwerker-v8';
+const CACHE_NAME = 'eure-handwerker-v9';
 
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './firebase-config.js',
+  './portal-features.js'
 ];
 
 self.addEventListener('install', event => {
